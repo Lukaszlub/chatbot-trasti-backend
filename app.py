@@ -1,44 +1,24 @@
-from fastapi import FastAPI
-from pydantic import BaseModel
-from langchain.chains import RetrievalQA
-from langchain_community.vectorstores import Chroma
-from langchain_openai import ChatOpenAI, OpenAIEmbeddings
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
-import os
-from dotenv import load_dotenv
-
-load_dotenv()
+from pydantic import BaseModel
 
 app = FastAPI()
 
+# 🔓 Middleware CORS — pozwala na połączenia np. z GitHub Pages
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["*"],  # lub ["https://lukaszlub.github.io"] dla większego bezpieczeństwa
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-embedding = OpenAIEmbeddings(
-    openai_api_key=os.getenv("OPENAI_API_KEY"),
-    organization="org-GmqnMo92LiCCNBTFLARvy7o6"
-)
-
-vectordb = Chroma(persist_directory="chroma_index", embedding_function=embedding)
-
-qa = RetrievalQA.from_chain_type(
-    llm=ChatOpenAI(
-        model_name="gpt-4",
-        temperature=0,
-        openai_api_key=os.getenv("OPENAI_API_KEY"),
-        organization="org-GmqnMo92LiCCNBTFLARvy7o6"
-    ),
-    retriever=vectordb.as_retriever()
-)
-
+# 🔹 Model zapytania
 class Question(BaseModel):
     question: str
 
+# 🔹 Przykładowy endpoint
 @app.post("/ask")
-def ask_question(q: Question):
-    return {"answer": qa.run(q.question)}
+async def ask(q: Question):
+    # Tutaj możesz wstawić integrację z LangChain / OpenAI / bazą wektorową
+    return {"answer": f"Otrzymałem: {q.question}"}
