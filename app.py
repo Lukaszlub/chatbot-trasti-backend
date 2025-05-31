@@ -4,35 +4,25 @@ from pydantic import BaseModel
 
 app = FastAPI()
 
-# 🔓 CORS Middleware
-origins = [
-    "https://lukaszlub.github.io",
-    "https://lukaszlub.github.io/chatbot-trasti-frontend",
-]
-
+# Middleware CORS – bardzo ważne, że PRZED wszystkim innym
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=["https://lukaszlub.github.io"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# ✅ Endpoint zdrowia (dla Render + dla testów)
-@app.get("/")
-async def root():
-    return {"message": "Chatbot backend działa"}
+# Model zapytania
+class Question(BaseModel):
+    question: str
 
-# ✅ Endpoint CORS preflight (nie zawsze potrzebny, ale bywa pomocny)
+# 🛠️ Ręczna obsługa preflight request (OPTIONS)
 @app.options("/ask")
 async def options_ask():
     return {}
 
-# 🔹 Model zapytania
-class Question(BaseModel):
-    question: str
-
-# 🔹 Endpoint bota
+# Endpoint główny
 @app.post("/ask")
 async def ask(q: Question):
     return {"answer": f"Otrzymałem: {q.question}"}
