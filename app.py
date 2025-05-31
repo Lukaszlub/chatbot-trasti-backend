@@ -4,25 +4,35 @@ from pydantic import BaseModel
 
 app = FastAPI()
 
-# 🔓 Zezwalamy tylko na ruch z GitHub Pages (lub inną stronę frontendową)
+# 🔓 CORS Middleware
+origins = [
+    "https://lukaszlub.github.io",
+    "https://lukaszlub.github.io/chatbot-trasti-frontend",
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://lukaszlub.github.io"],  # Twój frontend
-    allow_credentials=False,
+    allow_origins=origins,
+    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# 🔹 Model danych przychodzących z frontu
+# ✅ Endpoint zdrowia (dla Render + dla testów)
+@app.get("/")
+async def root():
+    return {"message": "Chatbot backend działa"}
+
+# ✅ Endpoint CORS preflight (nie zawsze potrzebny, ale bywa pomocny)
+@app.options("/ask")
+async def options_ask():
+    return {}
+
+# 🔹 Model zapytania
 class Question(BaseModel):
     question: str
 
-# 🔹 Przykładowa logika odpowiedzi (zamień na integrację z LangChain/OpenAI)
+# 🔹 Endpoint bota
 @app.post("/ask")
 async def ask(q: Question):
-    user_question = q.question.strip()
-    if not user_question:
-        return {"answer": "Nie otrzymałem pytania."}
-    
-    # Tutaj możesz użyć LangChain / OpenAI / Chroma itp.
-    return {"answer": f"🔁 Otrzymałem pytanie: {user_question}"}
+    return {"answer": f"Otrzymałem: {q.question}"}
