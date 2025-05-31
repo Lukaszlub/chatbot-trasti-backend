@@ -18,7 +18,12 @@ class Question(BaseModel):
     question: str
 
 # 🔹 Przykładowy endpoint
+from fastapi.responses import JSONResponse
+
+@app.options("/ask")
+async def options_handler():
+    return JSONResponse(status_code=200)
+
 @app.post("/ask")
 async def ask(q: Question):
-    # Tutaj możesz wstawić integrację z LangChain / OpenAI / bazą wektorową
     return {"answer": f"Otrzymałem: {q.question}"}
