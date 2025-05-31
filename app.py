@@ -4,25 +4,25 @@ from pydantic import BaseModel
 
 app = FastAPI()
 
-# Middleware CORS – bardzo ważne, że PRZED wszystkim innym
+# 🔓 Middleware CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://lukaszlub.github.io"],
+    allow_origins=["https://lukaszlub.github.io"],  # <- adres Twojej strony
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Model zapytania
+# 🔹 Model pytania
 class Question(BaseModel):
     question: str
 
-# 🛠️ Ręczna obsługa preflight request (OPTIONS)
+# 🔁 Opcjonalnie: obsługa zapytań OPTIONS ręcznie
 @app.options("/ask")
-async def options_ask():
+async def preflight():
     return {}
 
-# Endpoint główny
+# 🔹 Główna logika bota (zastąp integracją z OpenAI/LangChain)
 @app.post("/ask")
 async def ask(q: Question):
-    return {"answer": f"Otrzymałem: {q.question}"}
+    return {"answer": f"Odpowiedź na pytanie: {q.question}"}
