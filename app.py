@@ -7,7 +7,7 @@ app = FastAPI()
 # 🔓 Middleware CORS — pozwala na połączenia np. z GitHub Pages
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # lub ["https://lukaszlub.github.io"] dla większego bezpieczeństwa
+    allow_origins=["https://lukaszlub.github.io"],  # lub ["https://lukaszlub.github.io"] dla większego bezpieczeństwa
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
