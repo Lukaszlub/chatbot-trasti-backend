@@ -5,22 +5,23 @@ from pydantic import BaseModel
 
 app = FastAPI()
 
-# ✅ Poprawna domena frontendowa
+# ✅ CORS poprawnie skonfigurowany
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://lukaszlub.github.io", "https://lukaszlub.github.io/chatbot-trasti-frontend/"],
+    allow_origins=["https://lukaszlub.github.io"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
+# 🔹 Model zapytania
 class Question(BaseModel):
     question: str
 
-# ✅ Obsługa preflight (CORS - OPTIONS)
+# ✅ Obsługa preflight request (OPTIONS), aby uniknąć błędu 404
 @app.options("/ask")
-async def options_handler():
-    return JSONResponse(status_code=200)
+async def preflight():
+    return JSONResponse(content={"message": "CORS preflight ok"}, status_code=200)
 
 # 🔹 Główna logika
 @app.post("/ask")
