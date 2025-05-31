@@ -1,29 +1,28 @@
-from fastapi import FastAPI, Request
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 
 app = FastAPI()
 
-# ✅ CORS poprawnie skonfigurowany
+# 🔓 Zezwalamy tylko na ruch z GitHub Pages (lub inną stronę frontendową)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://lukaszlub.github.io"],
-    allow_credentials=True,
+    allow_origins=["https://lukaszlub.github.io"],  # Twój frontend
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# 🔹 Model zapytania
+# 🔹 Model danych przychodzących z frontu
 class Question(BaseModel):
     question: str
 
-# ✅ Obsługa preflight request (OPTIONS), aby uniknąć błędu 404
-@app.options("/ask")
-async def preflight():
-    return JSONResponse(content={"message": "CORS preflight ok"}, status_code=200)
-
-# 🔹 Główna logika
+# 🔹 Przykładowa logika odpowiedzi (zamień na integrację z LangChain/OpenAI)
 @app.post("/ask")
 async def ask(q: Question):
-    return {"answer": f"Otrzymałem: {q.question}"}
+    user_question = q.question.strip()
+    if not user_question:
+        return {"answer": "Nie otrzymałem pytania."}
+    
+    # Tutaj możesz użyć LangChain / OpenAI / Chroma itp.
+    return {"answer": f"🔁 Otrzymałem pytanie: {user_question}"}
